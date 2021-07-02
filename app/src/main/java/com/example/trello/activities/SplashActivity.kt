@@ -7,6 +7,8 @@ import android.os.Bundle
 import android.os.Handler
 import android.view.WindowManager
 import com.example.trello.R
+import com.example.trello.firebase.FirestoreClass
+import com.google.firebase.auth.FirebaseAuth
 import kotlinx.android.synthetic.main.activity_splash.*
 
 class SplashActivity : AppCompatActivity() {
@@ -26,7 +28,13 @@ class SplashActivity : AppCompatActivity() {
 
         @Suppress("DEPRECATION")
         Handler().postDelayed({
-            startActivity(Intent(this,IntroActivity::class.java))
+            val currentUser = FirestoreClass().getCurrentId()
+            if(currentUser.isNotEmpty()){
+                startActivity(Intent(this,MainActivity::class.java))
+            }else{
+                startActivity(Intent(this,IntroActivity::class.java))
+            }
+            finish()
         },2500)
     }
 }

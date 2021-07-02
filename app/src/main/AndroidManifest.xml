@@ -42,6 +42,7 @@
 
         <activity
             android:name=".activities.MainActivity"
+            android:theme="@style/Theme.Trello.NoActionBar"
             android:exported="true" />
     </application>
 
