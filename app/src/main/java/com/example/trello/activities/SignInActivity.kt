@@ -1,16 +1,18 @@
 package com.example.trello.activities
 
+import android.content.Intent
 import android.os.Bundle
 import android.text.TextUtils
 import android.util.Log
 import android.view.WindowManager
 import android.widget.Toast
 import com.example.trello.R
+import com.example.trello.firebase.FirestoreClass
+import com.example.trello.model.User
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.android.synthetic.main.activity_sign_in.*
 
 class SignInActivity : BaseActivity() {
-//    private lateinit var auth: FirebaseAuth
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -29,6 +31,13 @@ class SignInActivity : BaseActivity() {
         }
     }
 
+    fun signInSuccess(user: User) {
+        Log.d("SIGNIN","SUCCESS")
+        hideProgressDialog()
+        startActivity(Intent(this@SignInActivity, MainActivity::class.java))
+        this.finish()
+    }
+
     private fun signInRegisteredUser() {
         val email:String = et_email_sign_in.text.toString().trim {it <= ' '}
         val password:String = et_password_sign_in.text.toString().trim {it <= ' '}
@@ -38,17 +47,11 @@ class SignInActivity : BaseActivity() {
 
             FirebaseAuth.getInstance().signInWithEmailAndPassword(email, password)
                 .addOnCompleteListener(this) { task ->
-                    hideProgressDialog()
                     if (task.isSuccessful) {
-                        // Sign in success, update UI with the signed-in user's information
-                        Log.d("SIGNIN", "signInWithEmail:success")
-                        Toast.makeText(this, "Authentication Success.",
-                            Toast.LENGTH_SHORT).show()
+                        FirestoreClass().signInUser(this@SignInActivity)
                     } else {
                         // If sign in fails, display a message to the user.
                         Log.d("SIGNIN", "signInWithEmail:failure", task.exception)
-                        Toast.makeText(baseContext, "Authentication failed.",
-                            Toast.LENGTH_SHORT).show()
                     }
                 }
 
@@ -78,4 +81,5 @@ class SignInActivity : BaseActivity() {
             else -> true
         }
     }
+
 }

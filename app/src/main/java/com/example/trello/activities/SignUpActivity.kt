@@ -7,12 +7,13 @@ import android.util.Log
 import android.view.WindowManager
 import android.widget.Toast
 import com.example.trello.R
+import com.example.trello.firebase.FirestoreClass
+import com.example.trello.model.User
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseUser
 import kotlinx.android.synthetic.main.activity_sign_up.*
 
 class SignUpActivity : BaseActivity() {
-
-    private lateinit var auth: FirebaseAuth
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -68,20 +69,40 @@ class SignUpActivity : BaseActivity() {
             showProgressDiglog("Please waiting...")
             FirebaseAuth.getInstance().createUserWithEmailAndPassword(email, password)
                 .addOnCompleteListener(this) { task ->
-                    hideProgressDialog()
                     if (task.isSuccessful) {
-                        // Sign in success, update UI with the signed-in user's information
-                        Log.d("SIGNUP", "createUserWithEmail:success")
-                        auth.signOut()
+                        // Firebase registered user
+                        val firebaseUser:FirebaseUser = task.result!!.user!!
+                        // Registered Email
+                        val registeredEmail = firebaseUser.email!!
+
+                        val user = User(
+                            firebaseUser.uid, name, registeredEmail
+                        )
+                            FirestoreClass().registerUser(this,user)
                     } else {
-                        // If sign in fails, display a message to the user.
-                        Log.d("SIGNUP", "createUserWithEmail:failure", task.exception)
-                        Toast.makeText(baseContext, "Authentication failed.",
-                            Toast.LENGTH_SHORT).show()
+                        Toast.makeText(
+                            this@SignUpActivity,
+                            task.exception!!.message,
+                            Toast.LENGTH_SHORT
+                        ).show()
                     }
                 }
 
         }
+    }
+
+    fun userRegisteredSuccess() {
+        Toast.makeText(
+            this@SignUpActivity,
+            "You have successfully registered.",
+            Toast.LENGTH_SHORT
+        ).show()
+
+        hideProgressDialog()
+
+        FirebaseAuth.getInstance().signOut()
+
+        finish()
     }
 
 }
