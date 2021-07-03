@@ -1,6 +1,8 @@
 package com.example.trello.firebase
 
+import android.app.Activity
 import android.util.Log
+import com.example.trello.activities.MainActivity
 import com.example.trello.activities.SignInActivity
 import com.example.trello.activities.SignUpActivity
 import com.example.trello.model.User
@@ -28,20 +30,31 @@ class FirestoreClass {
             }
     }
 
-    fun signInUser(activity: SignInActivity){
+    fun signInUser(activity: Activity){
         mFireStore.collection(Constants.USER)
             .document(getCurrentId())
             .get()
             .addOnSuccessListener { document->
                 val loggedInUser = document.toObject(User::class.java)!!
-                activity.signInSuccess(loggedInUser)
+                when(activity){
+                    is SignInActivity -> {
+                        activity.signInSuccess(loggedInUser)
+                    }
+                    is MainActivity ->{
+                        activity.updateNavigationUserDetails(loggedInUser)
+                    }
+                }
+
             }
             .addOnFailureListener { e ->
-                Log.e(
-                    activity.javaClass.simpleName,
-                    "Error while getting loggedIn user details",
-                    e
-                )
+                when(activity){
+                    is SignInActivity -> {
+                        activity.hideProgressDialog()
+                    }
+                    is MainActivity ->{
+                        activity.hideProgressDialog()
+                    }
+                }
             }
     }
 

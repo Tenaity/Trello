@@ -36,6 +36,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center"
+            android:layout_marginStart="@dimen/authentication_screen_marginStartEnd"
+            android:layout_marginEnd="@dimen/authentication_screen_marginStartEnd"
             android:text="@string/sign_in_description_text"
             android:textColor="@color/secondary_text_color"
             android:textSize="@dimen/authentication_description_text_size" />
