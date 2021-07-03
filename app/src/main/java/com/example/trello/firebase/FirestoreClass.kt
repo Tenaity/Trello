@@ -3,6 +3,7 @@ package com.example.trello.firebase
 import android.app.Activity
 import android.util.Log
 import com.example.trello.activities.MainActivity
+import com.example.trello.activities.MyProfileActivity
 import com.example.trello.activities.SignInActivity
 import com.example.trello.activities.SignUpActivity
 import com.example.trello.model.User
@@ -30,45 +31,50 @@ class FirestoreClass {
             }
     }
 
-    fun signInUser(activity: Activity){
+    fun loadUserData(activity: Activity) {
         mFireStore.collection(Constants.USER)
             .document(getCurrentId())
             .get()
-            .addOnSuccessListener { document->
+            .addOnSuccessListener { document ->
                 val loggedInUser = document.toObject(User::class.java)!!
-                when(activity){
+                when (activity) {
                     is SignInActivity -> {
                         activity.signInSuccess(loggedInUser)
                     }
-                    is MainActivity ->{
+                    is MainActivity -> {
                         activity.updateNavigationUserDetails(loggedInUser)
+                    }
+                    is MyProfileActivity -> {
+                        activity.setUserDataInUi(loggedInUser)
                     }
                 }
 
             }
             .addOnFailureListener { e ->
-                when(activity){
+                when (activity) {
                     is SignInActivity -> {
                         activity.hideProgressDialog()
                     }
-                    is MainActivity ->{
+                    is MainActivity -> {
+                        activity.hideProgressDialog()
+                    }
+                    is MyProfileActivity -> {
                         activity.hideProgressDialog()
                     }
                 }
             }
     }
+        fun getCurrentId(): String {
+            // An Instance of currentUser using FirebaseAuth
+            val currentUser = FirebaseAuth.getInstance().currentUser
 
-    fun getCurrentId(): String {
-        // An Instance of currentUser using FirebaseAuth
-        val currentUser = FirebaseAuth.getInstance().currentUser
+            // A variable to assign the currentUserId if it is not null or else it will be blank.
+            var currentUserID = ""
+            if (currentUser != null) {
+                currentUserID = currentUser.uid
+            }
 
-        // A variable to assign the currentUserId if it is not null or else it will be blank.
-        var currentUserID = ""
-        if (currentUser != null) {
-            currentUserID = currentUser.uid
+            return currentUserID
         }
-
-        return currentUserID
-    }
-
 }
+
