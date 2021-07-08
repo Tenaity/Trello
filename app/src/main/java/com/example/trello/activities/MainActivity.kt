@@ -1,7 +1,9 @@
 package com.example.trello.activities
 
+import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.view.MenuItem
 import android.view.WindowManager
 import android.widget.Toast
@@ -17,6 +19,12 @@ import kotlinx.android.synthetic.main.app_bar_main.*
 import kotlinx.android.synthetic.main.nav_header_main.*
 
 class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedListener {
+
+    companion object {
+        const val MY_PROFILE_REQUEST_CODE: Int = 11
+
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -33,7 +41,7 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
         FirestoreClass().loadUserData(this)
     }
 
-    private fun setupActionBar(){
+    private fun setupActionBar() {
         setSupportActionBar(toolbar_main_activity)
         toolbar_main_activity.setNavigationIcon(R.drawable.ic_action_navigation_menu)
 
@@ -43,29 +51,43 @@ class MainActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedList
     }
 
     override fun onBackPressed() {
-        if(drawer_layout.isDrawerOpen(GravityCompat.START)){
+        if (drawer_layout.isDrawerOpen(GravityCompat.START)) {
             drawer_layout.closeDrawer(GravityCompat.START)
-        }else{
+        } else {
             doubleBackToExit()
         }
     }
 
     private fun toggleDrawer() {
-        if(drawer_layout.isDrawerOpen(GravityCompat.START)){
+        if (drawer_layout.isDrawerOpen(GravityCompat.START)) {
             drawer_layout.closeDrawer(GravityCompat.START)
-        }else{
+        } else {
             drawer_layout.openDrawer(GravityCompat.START)
         }
     }
 
+    @Suppress("DEPRECATION")
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (resultCode == Activity.RESULT_OK && requestCode == MY_PROFILE_REQUEST_CODE) {
+            FirestoreClass().loadUserData(this)
+        }else{
+            Log.e("Cancelled","Cancelled")
+        }
+    }
+
+    @Suppress("DEPRECATION")
     override fun onNavigationItemSelected(item: MenuItem): Boolean {
-        when(item.itemId) {
-            R.id.nav_my_profile ->{
-                startActivity(Intent(this@MainActivity,MyProfileActivity::class.java))
+        when (item.itemId) {
+            R.id.nav_my_profile -> {
+                startActivityForResult(
+                    Intent(this@MainActivity, MyProfileActivity::class.java),
+                    MY_PROFILE_REQUEST_CODE
+                )
             }
-            R.id.nav_sign_out ->{
-               FirebaseAuth.getInstance().signOut()
-                val intent = Intent(this@MainActivity,IntroActivity::class.java)
+            R.id.nav_sign_out -> {
+                FirebaseAuth.getInstance().signOut()
+                val intent = Intent(this@MainActivity, IntroActivity::class.java)
                 intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK)
                 startActivity(intent)
                 finish()

@@ -32,17 +32,17 @@ class SignInActivity : BaseActivity() {
     }
 
     fun signInSuccess(user: User) {
-        Log.d("SIGNIN","SUCCESS")
+        Log.d("SIGNIN", "SUCCESS")
         hideProgressDialog()
         startActivity(Intent(this@SignInActivity, MainActivity::class.java))
         this.finish()
     }
 
     private fun signInRegisteredUser() {
-        val email:String = et_email_sign_in.text.toString().trim {it <= ' '}
-        val password:String = et_password_sign_in.text.toString().trim {it <= ' '}
+        val email: String = et_email_sign_in.text.toString().trim { it <= ' ' }
+        val password: String = et_password_sign_in.text.toString().trim { it <= ' ' }
 
-        if (validateForm(email,password)){
+        if (validateForm(email, password)) {
             showProgressDiglog("Please waiting...")
 
             FirebaseAuth.getInstance().signInWithEmailAndPassword(email, password)
@@ -61,20 +61,20 @@ class SignInActivity : BaseActivity() {
     private fun setupActionBar() {
         setSupportActionBar(toolbar_sign_in_activity)
         val actionBar = supportActionBar
-        if(actionBar != null){
+        if (actionBar != null) {
             actionBar.setDisplayHomeAsUpEnabled(true)
             actionBar.setHomeAsUpIndicator(R.drawable.ic_black_color_back_24dp)
         }
         toolbar_sign_in_activity.setNavigationOnClickListener { onBackPressed() }
     }
 
-    private fun validateForm(email:String, password:String):Boolean{
+    private fun validateForm(email: String, password: String): Boolean {
         return when {
-            TextUtils.isEmpty(email) ->{
+            TextUtils.isEmpty(email) -> {
                 showErrorSnackBar("Please enter email.")
                 false
             }
-            TextUtils.isEmpty(password) ->{
+            TextUtils.isEmpty(password) -> {
                 showErrorSnackBar("Please enter password.")
                 false
             }

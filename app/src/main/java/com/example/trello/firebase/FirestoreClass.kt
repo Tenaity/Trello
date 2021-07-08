@@ -15,19 +15,19 @@ import com.google.firebase.firestore.SetOptions
 class FirestoreClass {
     private val mFireStore = FirebaseFirestore.getInstance()
 
-    fun registerUser(activity:SignUpActivity, userInfo : User){
+    fun registerUser(activity: SignUpActivity, userInfo: User) {
         mFireStore.collection(Constants.USER)
             .document(getCurrentId())
             .set(userInfo, SetOptions.merge())
             .addOnSuccessListener {
                 activity.userRegisteredSuccess()
             }
-            .addOnFailureListener {
-                    e ->
+            .addOnFailureListener { e ->
                 Log.e(
                     activity.javaClass.simpleName,
                     "Error writing document",
-                    e)
+                    e
+                )
             }
     }
 
@@ -64,17 +64,36 @@ class FirestoreClass {
                 }
             }
     }
-        fun getCurrentId(): String {
-            // An Instance of currentUser using FirebaseAuth
-            val currentUser = FirebaseAuth.getInstance().currentUser
 
-            // A variable to assign the currentUserId if it is not null or else it will be blank.
-            var currentUserID = ""
-            if (currentUser != null) {
-                currentUserID = currentUser.uid
+    fun updateUserProfileData(activity: MyProfileActivity, userHashMap: HashMap<String, Any>) {
+        mFireStore.collection(Constants.USER)
+            .document(getCurrentId())
+            .update(userHashMap)
+            .addOnSuccessListener{
+                Log.i(activity.javaClass.simpleName, "Profile Data updated successfully!")
+                activity.profileUpdateSuccess()
+            }.addOnFailureListener {
+                e ->
+                activity.hideProgressDialog()
+                Log.e(
+                    activity.javaClass.simpleName,
+                    "Error while creating a board.",
+                    e
+                )
             }
 
-            return currentUserID
-        }
-}
+    }
 
+    fun getCurrentId(): String {
+        // An Instance of currentUser using FirebaseAuth
+        val currentUser = FirebaseAuth.getInstance().currentUser
+
+        // A variable to assign the currentUserId if it is not null or else it will be blank.
+        var currentUserID = ""
+        if (currentUser != null) {
+            currentUserID = currentUser.uid
+        }
+
+        return currentUserID
+    }
+}
